@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Xitle y pedregales</title>
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Palette+Mosaic&display=swap" rel="stylesheet">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet'/>
+  </head>
+  <body>
+    <h1>El Xitle, creador de los Pedregales</h1>
+    <h2 id="titulo1">Introducción</h2>
+    <p class="parrafoNormal">El volcán <strong>Xitle</strong> (de nahuatl <i>xictli</i>, "ombligo") se encuentra en las faldas del Ajusco, en la Ciudad de México. Es un volcán del tipo cono de ceniza (o cono de escorias), es decir, con forma cónica y base redonda, una altura aproximada de 3100 metros sobre el nivel del mar y una pendiente de entre los 30° y 40°.<br><br>Hace aproximadamente 1700 años, tuvo una erupción que arrojó una colada de lava que transformó completamente el suroeste de la Cuenca de México. Aún en los años 50 se podía ver un paísaje rocoso y con poca vegetación que habría de portar el nombre de Pedregales.</p>
+    <img src="imagenes/xitleDron.jpeg" alt="">
+    <p id="creditosImagen">El Xitle, Santiago Arau (2018)</p>
+    <h2>La colada de lava del Xitle hoy en día</h2>
+    <p class="parrafoNormal">En el mapa a continuación veremos se verá hasta donde llegó la colada de lava y su relación espacial con las colonias que llevan el nombre "Pedregal".</p>
+    <div id="map"></div>
+    <div id="legend">
+    </div>
+    <p id="creditosFinales">Este trabajo fue elaborado en el marco de la clase de Cartografía Digital | Centro, 2021</p>
+
+    <script type="text/javascript">
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic2Ftb3JhdiIsImEiOiJja3JmYXBrczQ1dXQxMnBxaHRvenVydmVjIn0.o_lKIPtT475DOm3koWUGxQ'; //aquí va su token
+    var map = new mapboxgl.Map({
+        container: 'map', //aquí el id de su caja contenedora
+        style: 'mapbox://styles/samorav/ckrs40hfn115z17nb9y8xrqf9',
+        center: [-99.13, 19.32], // las coordenadas en las que se va a centrar su mapa [longitud, latitud]
+        zoom: 9.6 // el nivel de Zoom //aquí la clave de su estilo
+    });
+
+    // Aplicar un zoom mínimo
+    map.setMinZoom(9.6);
+
+    /*
+1. Agregar un captor de eventos que va a correr funciones al hacer clic
+*/
+map.on('click', function(e) {
+  var features = map.queryRenderedFeatures(e.point, {
+    layers: ['xitle-bnqtaw'] // añadir el nombre de su capa
+  });
+  if (!features.length) {
+    return;
+  }
+  var feature = features[0];
+
+  /*
+  2. Creamos el PopUp y su contenido.
+  */
+  var popup = new mapboxgl.Popup({ offset: [0, -30] }) // creamos el PopUp y le asignamos un offset
+    .setLngLat(feature.geometry.coordinates) // le especificamos las coordenadas (que forman parte de las propiedades del GeoJSON)
+    .setHTML('<h3>' + feature.properties.Nombre + '</h3>' +
+      '<h4>Altitud :' + feature.properties.Altidud + '</h4>' +
+      '<p id="descripcion">' + feature.properties.Desc + '</p>') // definimos el contenido del PopUp
+    .addTo(map);
+});
+
+/*
+1. Agregar un captor de eventos que va a correr funciones cuando se cargue el mapa
+*/
+map.on('load', function() {
+  //Creamos una tabla con la descripción de cada elemento de la leyenda
+  var layers = ['Colonias cuyo nombre contiene "Pedregal"', 'Colada del Xitle'];
+  //Creamos una tabla con lo colores correspondiente a cada descripción
+  var colors = ["#f4c243","#c70071"];
+
+/*
+2.Echamos a andar una función que va crear elementos HTML y los va a ir agregando al interior del <div> de la leyenda
+*/
+  for (i = 0; i < layers.length; i++) {
+  var layer = layers[i];
+  var color = colors[i];
+  var item = document.createElement('div');
+  item.className = 'legend-item';
+  var key = document.createElement('span');
+  key.className = 'legend-key';
+  key.style.backgroundColor = color;
+
+  var value = document.createElement('span');
+  value.innerHTML = layer;
+  item.appendChild(key);
+  item.appendChild(value);
+  legend.appendChild(item);
+}
+});
+
+    </script>
+  </body>
+</html>
